@@ -1,3 +1,3 @@
-# Wizzie Farm releases
+# Wizzie Farm (releases)
 
-Game update bundles for the Wizzie Farm desktop app. The app checks the latest release here and installs new game versions automatically.
+Game builds for the Wizzie Farm desktop app. The app checks this repository's **Releases** for updates.
