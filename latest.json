@@ -1,6 +1,6 @@
 {
-  "version": "1.2.0",
-  "file": "updates/wizzie-farm-game-1.2.0.zip",
-  "min_shell": "1.0.0",
-  "notes": "v1.2.0 Deck & Dungeon"
+ "version": "2.0.0",
+ "file": "updates/wizzie-farm-game-2.0.0.zip",
+ "min_shell": "1.0.0",
+ "notes": "v2.0 \"Schools, Pets & Realms\": school stats + Runeglass and the Spellwright; pets and the Hatchery Glade (breed, raise, a perfect pet ~2x at level 10); co-op Realms for up to 3 wizards (host + lantern-sigil code); story plants for the saga; new voice lines; save format v5 (your v1.2 save is backed up first; no deck card is ever trimmed). Character models and character creation come in v2.1."
 }
