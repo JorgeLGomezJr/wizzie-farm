@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wizzie Farm</title>
+<!-- v2.0: Cinzel + Nunito are bundled in game/fonts (SIL OFL 1.1), so the game looks the same offline -->
+<link rel="stylesheet" href="game/css/style.css">
+<link rel="stylesheet" href="game/css/cine.css">
+<link rel="stylesheet" href="game/css/cards.css">   <!-- v2.1 B5: spell card face -->
+<link rel="stylesheet" href="game/css/account.css">
+<link rel="stylesheet" href="game/css/bank.css">
+</head>
+<body>
+  <div id="canvas-wrap"></div>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div id="hud-player">
+      <div id="hud-level">1</div>
+      <div class="hud-bars">
+        <div id="hud-name"></div>
+        <div id="hud-hp" class="bar hp"><div class="fill"></div><span></span></div>
+        <div id="hud-mana" class="bar mana"><div class="fill"></div><span></span></div>
+        <div id="hud-xp" class="bar xp"><div class="fill"></div><span></span></div>
+      </div>
+      <div id="hud-gold-wrap"><span class="coin"></span><span id="hud-gold">0</span></div>
+    </div>
+    <div id="hud-map">
+      <canvas id="minimap" width="170" height="170"></canvas>
+      <div id="zone-name"></div>
+    </div>
+    <div id="tracker"></div>
+    <div id="hud-potions">
+      <button id="hud-hp-pot" class="pot hp" title="Drink a health potion (H)"></button>
+      <button id="hud-mana-pot" class="pot mana" title="Drink a mana potion (J)"></button>
+    </div>
+    <div id="hud-buttons">
+      <button id="hud-btn-quests" class="hbtn" title="Quest Log (L)"><b>&#10070;</b><span>Quests</span><small>L</small></button>
+      <button id="hud-btn-spells" class="hbtn" title="Spellbook &amp; Deck (K)"><b>&#10022;</b><span>Spells</span><small>K</small></button>
+      <button id="hud-btn-pack" class="hbtn" title="Backpack (B)"><b>&#9673;</b><span>Pack</span><small>B</small></button>
+      <button id="hud-btn-menu" class="hbtn" title="Menu (Esc)"><b>&#9776;</b><span>Menu</span><small>Esc</small></button>
+    </div>
+  </div>
+
+  <div id="prompt" class="hidden"></div>
+  <div id="floats"></div>
+  <div id="toasts"></div>
+  <div id="zone-banner"></div>
+  <div id="dialog" class="hidden"></div>
+  <div id="panel" class="hidden"></div>
+  <div id="combat" class="hidden"></div>
+  <div id="results" class="hidden"></div>
+  <div id="levelup"></div>
+  <div id="title" class="hidden"></div>
+  <div id="fade"></div>
+  <div id="loading">Loading Wizzie Farm&hellip;</div>
+  <div id="errors" class="hidden" title="Something went wrong - please report this text"></div>
+
+  <!-- 3D library -->
+  <script src="game/lib/three.min.js"></script>
+  <!-- Game data (edit these to add content) -->
+  <script src="game/data/schools.js"></script>
+  <script src="game/data/cards.js"></script>
+  <script src="game/data/cardart.js"></script>
+  <script src="game/data/progression.js"></script>
+  <script src="game/data/items.js"></script>
+  <script src="game/data/items_endgame.js"></script>
+  <script src="game/data/decks.js"></script>
+  <script src="game/data/recipes.js"></script>
+  <script src="game/data/enemies.js"></script>
+  <script src="game/data/enemies_dungeon.js"></script>
+  <script src="game/data/npcs.js"></script>
+  <script src="game/data/runeglass.js"></script>
+  <script src="game/data/quests.js"></script>
+  <script src="game/data/zones.js"></script>
+  <script src="game/data/dungeons.js"></script>
+  <script src="game/data/lore.js"></script>
+  <script src="game/data/realms.js"></script>
+  <script src="game/data/voices.js"></script>
+  <script src="game/data/pets.js"></script>          <!-- v2.0 WS-B: pets, snacks, pet cards -->
+  <script src="game/data/zones_glade.js"></script>   <!-- v2.0 WS-B: Hatchery Glade zone + NPCs + voices -->
+  <script src="game/data/characters.js"></script>   <!-- v2.1 WS-D: round-2 builds, creator presets, NPC builds -->
+  <script src="game/audio/voice/manifest.js"></script>
+  <!-- Engine -->
+  <script src="game/js/util.js"></script>
+  <script src="game/js/sfx.js"></script>
+  <script src="game/js/voice.js"></script>
+  <script src="game/js/textures.js"></script>
+  <script src="game/js/models.js"></script>
+  <script src="game/js/models_mounts.js"></script>
+  <script src="game/js/models_pets.js"></script>    <!-- v2.0 WS-B: procedural pet models -->
+  <script src="game/js/gfx.js"></script>
+  <script src="game/js/cine.js"></script>
+  <script src="game/js/combat.js"></script>
+  <script src="game/js/state.js"></script>
+  <script src="game/js/pets.js"></script>           <!-- v2.0 WS-B: pet rules + state hooks -->
+  <script src="game/js/world.js"></script>
+  <script src="game/js/combatView.js"></script>
+  <script src="game/js/cardart.js"></script>
+  <script src="game/js/ui.js"></script>
+  <script src="game/js/spellwright.js"></script>
+  <script src="game/js/story.js"></script>
+  <script src="game/js/bank.js"></script>
+  <script src="game/js/net/protocol.js"></script>
+  <script src="game/js/net/transport.js"></script>
+  <script src="game/js/net/realm.js"></script>
+  <script src="game/js/net/realmUI.js"></script>
+  <script src="game/js/petsUI.js"></script>         <!-- v2.0 WS-B: Pets panel, Hatchery, pet in world + duels -->
+  <script src="game/js/lookEditor.js"></script>      <!-- v2.1 WS-D: look editor (creator step 2 + the in-game Mirror) -->
+  <script src="game/js/dropHints.js"></script>       <!-- v2.1: dungeon drop hints (the Orrery keeper) -->
+  <script src="game/js/main.js"></script>
+</body>
+</html>

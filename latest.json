@@ -1,6 +1,6 @@
 {
- "version": "2.0.0",
- "file": "updates/wizzie-farm-game-2.0.0.zip",
+ "version": "2.1.0",
+ "file": "updates/wizzie-farm-game-2.1.0.zip",
  "min_shell": "1.0.0",
- "notes": "v2.0 \"Schools, Pets & Realms\": school stats + Runeglass and the Spellwright; pets and the Hatchery Glade (breed, raise, a perfect pet ~2x at level 10); co-op Realms for up to 3 wizards (host + lantern-sigil code); story plants for the saga; new voice lines; save format v5 (your v1.2 save is backed up first; no deck card is ever trimmed). Character models and character creation come in v2.1."
+ "notes": "v2.1 \"New Faces\": taller wizards and a character creator (Your look + the Mirror), 19 new NPC looks; Chatterbox voices with real emotion; the new spell cards; finite decks (no reshuffle) with a cards-left counter; a 1.5 s wand wind-up before every cast; bosses summon helpers; optional Heroic mode in the Hollow Orrery; own-school dungeon loot with T1/T2/T3 and the Duskherald boss set; flee any duel at any time; new names (Bright Pip, Nestling Glade, pet stages Hatchling to Starborn). Save format v6 (your v2.0 save is backed up first)."
 }

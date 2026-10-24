@@ -1,0 +1,341 @@
+/* =====================================================================
+   WIZZIE FARM — SPELL CARD FACE  (v2.1 B5, approved Oct 20)
+   Reference: docs/review/v2.1-cards/card-design-approved.png (+ .html).
+   Markup: WF.ui.cardEl (game/js/ui.js). Loaded after style.css + cine.css.
+
+   Every size comes from the card's own width (container query units:
+   1cqw = 1 % of the card width), so the same face works at 84 px (narrow
+   duel hand), 105-132 px (hand, spellbook, Spellwright, trainer), and
+   160-220 px (level-up, deck-editor peek, the mock-up size). Text that
+   carries numbers never renders below 10 px (x the player's text scale
+   --ts); the decoration shrinks instead.
+
+     .card.wf-card            container + glow / hover / state shadows
+       .c-face                gold double frame, filigree (::before), engraved line (::after)
+         .c-inner             school sunburst (attacks) or striped back (.support)
+           .c-top             .c-pips (gems) + .c-emb (school emblem)
+           .c-art             painted picture (WF.cardArt) or the type glyph
+           .c-lvl .c-badge .c-boss .c-pet .c-ribclip>.c-ribbon .c-spark   (on the picture)
+           .c-name            embossed banner with stars
+           .c-text            parchment: .c-rune watermark, .c-type, .c-desc (.c-rider)
+           .c-foot            .c-acc accuracy, .c-rank diamonds, .c-rar rarity gem
+           .c-foil            epic / legendary shimmer
+         .c-gem x4            corner gems in the school colour
+       .c-count .c-tc .c-key .c-why            (outside the face, unchanged hooks; v2.1 A7 removed .c-boost)
+   ===================================================================== */
+
+.card.wf-card {
+  --gold-l: #ffe6a0; --gold-d: #3b2a10;
+  --c1: color-mix(in srgb, var(--sc) 72%, var(--scd));     /* school mid  */
+  --c2: color-mix(in srgb, var(--sc) 55%, #fff);           /* school light */
+  --c3: color-mix(in srgb, var(--scd) 62%, #000);          /* school night */
+  container: wfcard / inline-size;
+  position: relative; flex: none; display: flex; flex-direction: column;
+  height: auto; min-height: auto; aspect-ratio: 220 / 320;   /* min-height auto: a long text grows the card, never overflows */
+  padding: 0; border: 0; border-radius: 7% / 4.8%; background: none; color: #2b1a08;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, .55);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.card.wf-card.small { cursor: default; }
+/* (flex / grid items with an aspect ratio do not stretch by default: a hand of cards keeps one height) */
+#cb-hand .card.wf-card, .lu-cards .card.wf-card, #cb-tc-panel .card.wf-card { align-self: stretch; }
+
+/* ---------------------------------------------------------------- frame */
+.wf-card .c-face {
+  --artt: 11.5cqw; --arth: 50cqw;                           /* picture top / height (compact) */
+  position: relative; flex: 1 1 auto; display: flex; flex-direction: column;
+  border-radius: inherit; padding: 4.6cqw;
+  background: linear-gradient(145deg, #fff3c4, #b88a35 22%, #fff6d6 40%, #7d5a1e 60%, #f6dd92 80%, #9c742c);
+  box-shadow: 0 0 0 max(1px, .8cqw) var(--gold-d);
+}
+.wf-card.support .c-face { --arth: 54cqw; }
+@container wfcard (min-width: 170px) {
+  .wf-card .c-face { --artt: 21cqw; --arth: 57cqw; }
+  .wf-card.support .c-face { --arth: 61cqw; }
+}
+/* engraved second line of the double frame */
+.wf-card .c-face::after {
+  content: ''; position: absolute; inset: 1.7cqw; z-index: 2; pointer-events: none;
+  border-radius: 5.6cqw / 3.9cqw; border: max(1px, .6cqw) solid rgba(60, 40, 10, .75);
+  box-shadow: inset 0 0 0 max(1px, .8cqw) rgba(255, 240, 190, .55);
+}
+/* filigree corners (original art from the approved mock-up) */
+.wf-card .c-face::before {
+  content: ''; position: absolute; inset: 4.2cqw; z-index: 2; pointer-events: none;
+  background:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><g fill='none' stroke='%23ffe6a0'><path d='M3 41V12Q3 3 12 3H41' stroke-width='2.5'/><path d='M8 34Q8 8 34 8' stroke-width='1.2' opacity='.8'/></g><g fill='%23ffe6a0'><circle cx='12' cy='12' r='3.2'/><path d='M16 6q6 2 4 8q-6-1-4-8zM6 16q2 6 8 4q-1-6-8-4z' opacity='.85'/><circle cx='41' cy='3' r='1.6'/><circle cx='3' cy='41' r='1.6'/></g></svg>") left top / 19cqw 19cqw no-repeat,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><g transform='matrix(-1 0 0 1 44 0)'><g fill='none' stroke='%23ffe6a0'><path d='M3 41V12Q3 3 12 3H41' stroke-width='2.5'/><path d='M8 34Q8 8 34 8' stroke-width='1.2' opacity='.8'/></g><g fill='%23ffe6a0'><circle cx='12' cy='12' r='3.2'/><path d='M16 6q6 2 4 8q-6-1-4-8zM6 16q2 6 8 4q-1-6-8-4z' opacity='.85'/><circle cx='41' cy='3' r='1.6'/><circle cx='3' cy='41' r='1.6'/></g></g></svg>") right top / 19cqw 19cqw no-repeat,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><g transform='matrix(1 0 0 -1 0 44)'><g fill='none' stroke='%23ffe6a0'><path d='M3 41V12Q3 3 12 3H41' stroke-width='2.5'/><path d='M8 34Q8 8 34 8' stroke-width='1.2' opacity='.8'/></g><g fill='%23ffe6a0'><circle cx='12' cy='12' r='3.2'/><path d='M16 6q6 2 4 8q-6-1-4-8zM6 16q2 6 8 4q-1-6-8-4z' opacity='.85'/><circle cx='41' cy='3' r='1.6'/><circle cx='3' cy='41' r='1.6'/></g></g></svg>") left bottom / 19cqw 19cqw no-repeat,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><g transform='matrix(-1 0 0 -1 44 44)'><g fill='none' stroke='%23ffe6a0'><path d='M3 41V12Q3 3 12 3H41' stroke-width='2.5'/><path d='M8 34Q8 8 34 8' stroke-width='1.2' opacity='.8'/></g><g fill='%23ffe6a0'><circle cx='12' cy='12' r='3.2'/><path d='M16 6q6 2 4 8q-6-1-4-8zM6 16q2 6 8 4q-1-6-8-4z' opacity='.85'/><circle cx='41' cy='3' r='1.6'/><circle cx='3' cy='41' r='1.6'/></g></g></svg>") right bottom / 19cqw 19cqw no-repeat;
+}
+/* four corner gems in the school colour */
+.wf-card .c-gem {
+  position: absolute; z-index: 5; width: max(6px, 5.4cqw); height: max(6px, 5.4cqw); transform: rotate(45deg); pointer-events: none;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--c2) 40%, var(--sc) 85%);
+  box-shadow: 0 0 0 max(1px, .8cqw) var(--gold-l), 0 0 0 max(1.5px, 1.4cqw) #4a3410, 0 0 2.5cqw var(--sc);
+}
+.wf-card .c-gem.g1 { top: -1.2cqw; left: calc(50% - max(3px, 2.7cqw)); }
+.wf-card .c-gem.g2 { bottom: -1.2cqw; left: calc(50% - max(3px, 2.7cqw)); }
+.wf-card .c-gem.g3 { left: -1.2cqw; top: calc(50% - max(3px, 2.7cqw)); }
+.wf-card .c-gem.g4 { right: -1.2cqw; top: calc(50% - max(3px, 2.7cqw)); }
+
+/* ----------------------------------------------------------- inner face */
+.wf-card .c-inner {
+  position: relative; flex: 1 1 auto; display: flex; flex-direction: column;
+  border-radius: 4.6cqw / 3.2cqw;
+  background: radial-gradient(ellipse at 50% 32%, var(--c1), var(--c3) 58%, #0b0605 100%);
+  box-shadow: inset 0 0 0 max(1px, .9cqw) var(--c1), inset 0 0 8cqw rgba(0, 0, 0, .75);
+}
+/* school sunburst */
+.wf-card .c-inner::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; border-radius: inherit; pointer-events: none; opacity: .2;
+  background: repeating-conic-gradient(from 0deg at 50% 30%, var(--c2) 0 2deg, transparent 2deg 12deg);
+}
+/* support spells (blades, traps, shields, weakness, absorb, heals): striped back + round window */
+.wf-card.support .c-inner {
+  background:
+    radial-gradient(ellipse at 50% 32%, color-mix(in srgb, var(--c1) 55%, transparent), transparent 62%),
+    repeating-linear-gradient(45deg, var(--c3) 0 3.6cqw, color-mix(in srgb, var(--c3) 70%, var(--c1)) 3.6cqw 7.2cqw);
+}
+.wf-card.support .c-inner::before { opacity: .13; }
+
+/* ------------------------------------------------------- pips + emblem */
+.wf-card .c-top {
+  position: absolute; z-index: 3; top: 2.6cqw; left: 3.6cqw; right: 2.4cqw; height: auto; margin: 0;
+  display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none;
+}
+.wf-card .c-pips { display: flex; align-items: center; gap: 1.1cqw; padding: 1.2cqw 0 0; background: none; box-shadow: none; border-radius: 0; }
+.wf-card .c-pips i {
+  flex: none; width: max(8px, 7cqw); height: max(8px, 7cqw); border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--c2) 42%, var(--sc) 78%, var(--scd));
+  box-shadow: 0 0 1.8cqw var(--sc), 0 0 0 max(1px, .7cqw) #3b2a10;
+}
+.wf-card .c-pips em { font-style: normal; }
+.wf-card .c-pips .pip0 {
+  display: grid; place-items: center; width: max(10px, 7.6cqw); height: max(10px, 7.6cqw); border-radius: 50%; padding: 0;
+  font: 800 max(8px, 5cqw)/1 var(--body); color: var(--gold-l); background: rgba(12, 8, 4, .78);
+  box-shadow: 0 0 0 max(1px, .6cqw) var(--gold-l);
+}
+.wf-card .c-pips .pipx {
+  margin-left: .4cqw; padding: 0 1.4cqw; border-radius: 3cqw; font: 800 max(9px, 5.4cqw)/1.3 var(--body) !important;
+  color: #fff !important; background: rgba(12, 8, 4, .72); text-shadow: 0 1px 1px #000;
+}
+.wf-card .c-emb {
+  display: grid; place-items: center; width: 18cqw; height: 18cqw; min-width: 16px; min-height: 16px; border-radius: 50%;
+  color: #fff8e6;
+  background: radial-gradient(circle at 40% 32%, var(--c2), var(--sc) 52%, var(--scd));
+  box-shadow: 0 0 0 max(1px, .9cqw) var(--gold-l), 0 0 0 max(2px, 1.8cqw) #4a3410, 0 0 4cqw var(--sc);
+}
+.wf-card .c-emb svg { width: 70%; height: 70%; fill: currentColor; overflow: visible; filter: drop-shadow(0 .5cqw .4cqw rgba(0, 0, 0, .55)); }
+.wf-card .c-emb .hi { fill: var(--scd); opacity: .75; }
+.wf-card .c-emb b { font: 800 10cqw/1 var(--display); }
+
+/* ---------------------------------------------------------------- art */
+.wf-card .c-art,
+#cb-hand .card.wf-card .c-art, .dk-slot .card.wf-card .c-art, .dk-ghost .card.wf-card .c-art {
+  position: relative; z-index: 1; flex: none; display: block; overflow: hidden;
+  height: var(--arth); margin: var(--artt) 3.2cqw 0; aspect-ratio: auto;
+  border-radius: 2.6cqw 2.6cqw 40% 40% / 2.6cqw 2.6cqw 7cqw 7cqw;
+  background: radial-gradient(circle at 50% 60%, color-mix(in srgb, var(--sc) 70%, #fff) 0%, var(--sc) 30%, var(--scd) 85%);
+  box-shadow: 0 0 0 max(1px, .9cqw) var(--gold-l), 0 0 0 max(2px, 1.8cqw) var(--c1), 0 1cqw 3cqw rgba(0, 0, 0, .6);
+}
+.wf-card.support .c-art,
+#cb-hand .card.wf-card.support .c-art, .dk-slot .card.wf-card.support .c-art, .dk-ghost .card.wf-card.support .c-art {
+  margin-left: 17cqw; margin-right: 17cqw; border-radius: 50%;
+}
+.wf-card .c-art .c-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; display: block; -webkit-user-drag: none; user-select: none; }
+.wf-card .c-art::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 18%, rgba(255, 255, 255, .22), transparent 55%), linear-gradient(180deg, transparent 62%, rgba(0, 0, 0, .42));
+}
+/* no picture (or it failed to load): the big type glyph */
+.wf-card .c-art:not(.has-art)::before, .wf-card .c-art.noart::before {
+  content: attr(data-glyph); position: absolute; inset: 0; display: grid; place-items: center;
+  font-size: 22cqw; line-height: 1; color: #fff; text-shadow: 0 0 3cqw #fff, 0 1cqw 2cqw rgba(0, 0, 0, .6);
+}
+/* type glyph badge (bottom-right of the picture) */
+.wf-card .c-badge, .card.wf-card .c-badge {
+  position: absolute; z-index: 3; right: 4.6cqw; top: calc(var(--artt) + var(--arth) - 15cqw);
+  width: max(13px, 10.5cqw); height: max(13px, 10.5cqw); border-radius: 50%; display: grid; place-items: center;
+  font-size: max(8px, 6cqw); line-height: 1; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .7);
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--sc) 55%, #fff), var(--sc) 45%, var(--scd));
+  border: max(1px, .6cqw) solid #fff3c8; box-shadow: 0 1px 4px rgba(0, 0, 0, .7);
+}
+.wf-card.support .c-badge { right: 4cqw; }
+/* level badge ("L3") */
+.wf-card .c-lvl {
+  position: absolute; z-index: 3; left: 5.4cqw; top: calc(var(--artt) + 2cqw);
+  min-width: max(15px, 11cqw); height: max(15px, 11cqw); padding: 0 1cqw; box-sizing: border-box; border-radius: 99px;
+  display: grid; place-items: center; font: 800 max(8px, 5cqw)/1 var(--display); color: var(--gold-l);
+  background: rgba(26, 18, 10, .92); border: max(1px, .6cqw) solid var(--gold-l); box-shadow: 0 0 2.4cqw var(--sc);
+}
+.wf-card.support .c-lvl { left: 3.6cqw; }
+/* boss-earned spells / pet cards: a ribbon across the bottom-left of the picture */
+.wf-card .c-boss, .card.wf-card .c-boss {
+  position: absolute; z-index: 3; left: 3.2cqw; top: calc(var(--artt) + var(--arth) - 14cqw); bottom: auto;
+  padding: .3cqw 2.6cqw .3cqw 1.8cqw; border-radius: 0 3cqw 3cqw 0; white-space: nowrap;
+  font: 800 max(8px, 4.6cqw)/1.35 var(--body); letter-spacing: .04em; text-transform: uppercase; color: #3a2400; text-shadow: none;
+  background: linear-gradient(#ffe9a0, #e8a820); box-shadow: 0 1px 3px rgba(0, 0, 0, .6);
+}
+.wf-card .c-boss.c-pet { color: #4a1036; background: linear-gradient(#ffe0f2, #ff9fd2); display: flex; align-items: center; gap: .25em; }
+.wf-card .c-pet svg { width: 1.15em; height: 1.15em; fill: currentColor; flex: none; }
+.wf-card.support .c-boss { left: 2cqw; }
+/* Runeglass: diagonal RANK n ribbon across the picture's top-right corner (v2.1 A1). --rd = how far the
+   ribbon's centre line sits from the corner: far enough that "RANK n" always fits (the text has a px floor) */
+.wf-card .c-ribclip {
+  --rd: max(21px, 12cqw); --rs: calc(var(--rd) * 1.4142 + 12px);
+  position: absolute; z-index: 2; right: 3.2cqw; top: var(--artt); width: var(--rs); height: var(--rs); overflow: hidden; pointer-events: none;
+  border-top-right-radius: 2.6cqw;
+}
+.wf-card.support .c-ribclip { right: 0; }
+.wf-card .c-ribbon {
+  position: absolute; left: calc(var(--rs) - var(--rd) * .7071); top: calc(var(--rd) * .7071); width: calc(var(--rd) * 3.2);
+  transform: translate(-50%, -50%) rotate(45deg); text-align: center; pointer-events: auto;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--pc, #3fb6ff) 85%, #000), var(--pc, #3fb6ff) 30%, color-mix(in srgb, var(--pc, #3fb6ff) 45%, #fff) 70%, var(--pc, #3fb6ff));
+  box-shadow: 0 .6cqw 1.6cqw rgba(0, 0, 0, .55), 0 0 0 max(1px, .5cqw) rgba(255, 255, 255, .55);
+}
+.wf-card .c-rank-r { display: block; font: 800 max(7.5px, 4.6cqw)/1.55 var(--display); letter-spacing: .08em; color: #06223a; text-shadow: 0 1px 0 rgba(255, 255, 255, .5); }
+/* epic / legendary sparkles */
+.wf-card .c-spark { position: absolute; z-index: 3; font-style: normal; line-height: 1; pointer-events: none; color: #fff6c8;
+  text-shadow: 0 0 2cqw var(--rc), 0 0 1cqw #fff; animation: wfTwinkle 2.8s ease-in-out infinite; }
+.wf-card .c-spark.k1 { top: calc(var(--artt) + 8cqw); right: 21cqw; font-size: max(8px, 5.6cqw); }
+.wf-card .c-spark.k2 { top: calc(var(--artt) + var(--arth) * .62); left: 12cqw; font-size: max(8px, 5.4cqw); animation-delay: -1.1s; }
+.wf-card .c-spark.k3 { top: calc(var(--artt) + var(--arth) * .34); right: 9cqw; font-size: max(6px, 4cqw); animation-delay: -2s; }
+@keyframes wfTwinkle { 0%, 100% { opacity: .25; transform: scale(.6) rotate(0deg); } 50% { opacity: 1; transform: scale(1.15) rotate(25deg); } }
+
+/* ------------------------------------------------------- name banner */
+.wf-card .c-name, #cb-hand .card.wf-card .c-name {
+  position: relative; z-index: 2; flex: none; display: flex; align-items: center; justify-content: center; min-height: 0;
+  margin: -3.6cqw .4cqw 0; padding: 1.5cqw 10.5cqw 1.3cqw; text-align: center; overflow-wrap: break-word;
+  font: 800 clamp(calc(10.5px * var(--ts, 1)), 7.4cqw, calc(18px * var(--ts, 1)))/1.05 var(--display); letter-spacing: .01em;
+  color: #fff6dc; text-shadow: 0 1px 1px #000, 0 0 3px rgba(0, 0, 0, .9), 0 0 6px var(--sc);
+  background: linear-gradient(180deg, var(--c2), var(--c1) 42%, var(--c3));
+  border-top: max(1px, .8cqw) solid var(--gold-l); border-bottom: max(1px, .8cqw) solid var(--gold-l);
+  clip-path: polygon(0 50%, 6.5% 0, 93.5% 0, 100% 50%, 93.5% 100%, 6.5% 100%);
+}
+.wf-card .c-name::before, .wf-card .c-name::after {
+  content: '✦'; position: absolute; top: 50%; transform: translateY(-50%); font-size: max(7px, 5.4cqw); line-height: 1;
+  color: var(--gold-l); text-shadow: 0 0 2cqw var(--sc), 0 1px 1px #000;
+}
+.wf-card .c-name::before { left: 6.6cqw; } .wf-card .c-name::after { right: 6.6cqw; }
+.wf-card.support .c-name { clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%); }
+
+/* ------------------------------------------------------- effect box */
+.wf-card .c-text {
+  position: relative; z-index: 2; flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5cqw;
+  margin: 1.8cqw 3.8cqw 0; padding: 1.8cqw 2.2cqw 2cqw; border-radius: 2.4cqw; text-align: center;
+  background: linear-gradient(180deg, #fff7df, #f1dfb2); border: max(1px, .6cqw) solid #8a6424;
+  box-shadow: inset 0 0 5cqw rgba(120, 80, 20, .32), 0 0 0 max(1px, .9cqw) var(--c1);
+  color: #2b1a08;
+}
+.wf-card .c-rune {
+  position: absolute; left: 50%; top: 50%; height: 84%; max-width: 64%; transform: translate(-50%, -50%); pointer-events: none;
+  fill: none; stroke: var(--c1); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; opacity: .16;
+}
+.wf-card .c-type, #cb-hand .card.wf-card .c-type {
+  position: relative; margin: 0; letter-spacing: .07em; text-transform: uppercase; white-space: nowrap;
+  font: 800 max(calc(8px * var(--ts, 1)), 4.3cqw)/1.15 var(--body); color: color-mix(in srgb, var(--scd) 80%, #2b1a08);
+}
+.wf-card .c-desc, #cb-hand .card.wf-card .c-desc, .dk-slot .card.wf-card .c-desc {
+  position: relative; flex: none; padding: 0; overflow-wrap: break-word;
+  font: 600 clamp(calc(10px * var(--ts, 1)), 2.4px + 5.9cqw, calc(13.5px * var(--ts, 1)))/1.18 var(--body); color: #2b1a08;
+}
+.wf-card .c-desc b { color: var(--scd); font-weight: 800; }
+.wf-card .c-rider { display: block; margin-top: .25em; color: #4a3414; font-size: max(calc(10px * var(--ts, 1)), .93em); }
+
+/* --------------------------------------------------------------- foot */
+.wf-card .c-foot {
+  position: relative; z-index: 3; flex: none; display: flex; align-items: center; justify-content: space-between; gap: 1cqw;
+  margin: 1.8cqw 2.6cqw 2.2cqw; min-height: 8cqw;
+}
+.wf-card .c-acc, .card.art.wf-card .c-acc {
+  flex: none; padding: 0 2.2cqw; border-radius: 99px; white-space: nowrap; box-shadow: 0 0 2cqw rgba(0, 0, 0, .5);
+  font: 800 max(calc(10px * var(--ts, 1)), 5.4cqw)/1.3 var(--body); color: var(--gold-l);
+  background: #1a120a; border: max(1px, .6cqw) solid var(--gold-l);
+}
+.wf-card .c-acc i { font-style: normal; font-weight: 600; }
+.wf-card .c-rank {
+  position: static; transform: none; flex: 1 1 auto; min-width: 0; overflow: hidden; text-align: center; white-space: nowrap;
+  background: none; border: 0; box-shadow: none; padding: 0;
+  font-size: max(8px, 5cqw); line-height: 1; letter-spacing: -.04em; color: rgba(255, 230, 160, .5); text-shadow: 0 1px 1px #000;
+}
+.wf-card .c-rank-d { color: inherit; font-size: 1em; letter-spacing: inherit; }
+.wf-card .c-rank.on { color: var(--pc, #9fe6ff); text-shadow: 0 0 2cqw var(--pc, #9fe6ff), 0 1px 1px #000; }
+.wf-card .c-rar {
+  flex: none; margin-left: auto; width: max(8px, 6cqw); height: max(8px, 6cqw); border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--rc) 48%, color-mix(in srgb, var(--rc) 55%, #000));
+  box-shadow: 0 0 0 max(1px, .7cqw) var(--gold-l), 0 0 0 max(1.5px, 1.3cqw) #3b2a10;
+}
+.wf-card.r-epic .c-rar, .wf-card.r-legendary .c-rar { box-shadow: 0 0 0 max(1px, .7cqw) var(--gold-l), 0 0 0 max(1.5px, 1.3cqw) #3b2a10, 0 0 3.5cqw var(--rc); }
+
+/* compact cards: drop what does not fit, never the numbers */
+@container wfcard (max-width: 150px) {
+  .wf-card .c-tsch { display: none; }
+  .wf-card .c-top { top: 1.8cqw; }
+  .wf-card .c-emb { width: 15.5cqw; height: 15.5cqw; }     /* clears the RANK ribbon on the picture corner */
+}
+@container wfcard (max-width: 112px) {
+  .wf-card .c-name, #cb-hand .card.wf-card .c-name { padding-left: 4cqw; padding-right: 4cqw; letter-spacing: 0; }
+  .wf-card .c-name::before, .wf-card .c-name::after { display: none; }
+  .wf-card .c-text { margin-left: 2.6cqw; margin-right: 2.6cqw; padding-left: 1.4cqw; padding-right: 1.4cqw; }
+}
+@container wfcard (max-width: 104px) { .wf-card .c-acc i { display: none; } .wf-card .c-rank { letter-spacing: -.12em; } }
+
+/* ------------------------------------------- epic / legendary: foil + aura */
+.wf-card .c-foil {
+  position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none; mix-blend-mode: screen;   /* over the art + back, under the text */
+  background: linear-gradient(115deg, transparent 28%, color-mix(in srgb, var(--rc) 30%, transparent) 40%, rgba(255, 244, 200, .42) 46%,
+    rgba(170, 225, 255, .32) 52%, transparent 64%) 0 0 / 260% 100% no-repeat;
+  animation: wfFoil 7s linear infinite;
+}
+@keyframes wfFoil { from { background-position: 135% 0; } to { background-position: -35% 0; } }
+.wf-card.r-epic .c-face { box-shadow: 0 0 0 max(1px, .8cqw) var(--gold-d), 0 0 5cqw color-mix(in srgb, var(--rc) 70%, transparent); }
+.wf-card.r-legendary .c-face { box-shadow: 0 0 0 max(1px, .8cqw) var(--gold-d), 0 0 6cqw color-mix(in srgb, #ffcf5a 85%, transparent), 0 0 13cqw color-mix(in srgb, var(--rc) 45%, transparent); }
+
+/* ------------------------------------------------------- Spell Scrolls */
+/* a scroll copy (used up when cast) gets a silver frame so it never passes for a deck card */
+.wf-card.tc .c-face { background: linear-gradient(145deg, #f2fbff, #86aec4 22%, #f7fcff 40%, #557a90 60%, #d9eef8 80%, #6f93a8); }
+.card.wf-card .c-tc { z-index: 6; left: -6px; top: -8px; padding: 1px 7px; border-radius: 8px; letter-spacing: .06em; font: 800 max(9px, 6.5cqw) var(--body);
+  background: linear-gradient(#c8f2ff, #8be0ff); color: #002233; border: 1.5px solid #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, .5); }
+
+/* --------------------------------------------- outside hooks (unchanged API) */
+.card.wf-card .c-count { z-index: 6; }
+.card.wf-card .c-key { z-index: 6; }
+.card.wf-card .c-why, #cb-hand .card.wf-card .c-why, #cb-tc-panel .card.wf-card .c-why {
+  z-index: 7; left: 8%; right: 8%; top: 36%; bottom: auto; transform: translateY(-50%);
+  font: 800 max(calc(10px * var(--ts, 1)), 6cqw)/1.2 var(--body);
+}
+/* pet cards: petsUI.js's pink ring + paw corner are replaced by the "Pet spell" ribbon */
+.card.wf-card.pet-card { box-shadow: 0 6px 14px rgba(0, 0, 0, .55); }
+.card.wf-card.pet-card::after { content: none; }
+
+/* --------------------------------------------------- states + hover tilt */
+.card.wf-card.ranked { box-shadow: 0 6px 14px rgba(0, 0, 0, .5), 0 0 0 2px var(--pc, #9fe6ff), 0 0 12px color-mix(in srgb, var(--pc, #9fe6ff) 50%, transparent); }
+.card.wf-card:not(.disabled):not(.small):not(.selected):hover {
+  transform: perspective(700px) translateY(-10px) rotateX(5deg) rotateY(-7deg) scale(1.04);
+  box-shadow: 0 14px 26px rgba(0, 0, 0, .6), 0 0 0 1px var(--gold-l), 0 0 20px var(--sc);
+}
+.card.wf-card.selected { transform: perspective(700px) translateY(-16px) scale(1.06); box-shadow: 0 0 0 3px #fff, 0 0 24px var(--sc); }
+.dk-slot:hover .card.wf-card, .dk-slot:focus-visible .card.wf-card { transform: perspective(700px) translateY(-4px) rotateX(4deg) rotateY(-5deg) scale(1.03); }
+.dk-slot.future:hover .card.wf-card { transform: none; }
+.dk-peek .card.wf-card:hover { transform: none; }
+
+/* --------------------------------------------- bigger showcase contexts */
+.dk-peek .card.wf-card { width: 184px; }
+.lu-cards .card.wf-card { width: 160px; }
+
+/* ------------------------------ reduced motion: no tilt, no shimmer / twinkle */
+body.reduce-motion .wf-card .c-foil { animation: none; background-position: 50% 0; }
+body.reduce-motion .wf-card .c-spark { animation: none; opacity: .85; transform: none; }
+body.reduce-motion .card.wf-card:not(.disabled):not(.small):not(.selected):hover { transform: translateY(-8px); }
+body.reduce-motion .card.wf-card.selected { transform: translateY(-14px); }
+body.reduce-motion .dk-slot:hover .card.wf-card, body.reduce-motion .dk-slot:focus-visible .card.wf-card { transform: translateY(-3px); }
+body.reduce-motion .card.wf-card { transition: box-shadow .18s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .wf-card .c-foil { animation: none; background-position: 50% 0; }
+  .wf-card .c-spark { animation: none; opacity: .85; transform: none; }
+  .card.wf-card:not(.disabled):not(.small):not(.selected):hover { transform: translateY(-8px); }
+  .card.wf-card.selected { transform: translateY(-14px); }
+  .dk-slot:hover .card.wf-card, .dk-slot:focus-visible .card.wf-card { transform: translateY(-3px); }
+  .card.wf-card { transition: box-shadow .18s ease; }
+}
